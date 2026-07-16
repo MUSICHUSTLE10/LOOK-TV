@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- Fond blanc arrondi -->
+  <rect x="0" y="8" width="52" height="44" rx="10" ry="10" fill="#FFFFFF"/>
+  <!-- Triangle play noir -->
+  <polygon points="18,18 18,42 40,30" fill="#000000"/>
+  <!-- Texte LOOK en blanc -->
+  <text x="60" y="38" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#FFFFFF" letter-spacing="1">LOOK</text>
+  <!-- Texte TV en blanc -->
+  <text x="142" y="38" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#FFFFFF" letter-spacing="1">TV</text>
+</svg>

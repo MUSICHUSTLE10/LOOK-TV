@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOOK TV - Streaming TV & Radio Mondial</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">
+                <img src="images/logo.svg" alt="LOOK TV" style="height:44px;">
+            </div>
+        </div>
+        <div class="nav-center">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Rechercher une chaîne, radio, pays...">
+                <button class="search-clear" id="searchClear" style="display:none"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="live-indicator"><span class="dot"></span> EN DIRECT</div>
+            <div class="channel-count-badge" id="channelCount">
+                <i class="fas fa-tv"></i> <span>...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="app-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+
+            <!-- Mode Tabs TV / Radio / Favoris -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="tabTV" onclick="switchMode('tv')">
+                    <i class="fas fa-tv"></i><span class="tab-label">TV</span>
+                </button>
+                <button class="mode-tab" id="tabRadio" onclick="switchMode('radio')">
+                    <i class="fas fa-broadcast-tower"></i><span class="tab-label">Radio</span>
+                </button>
+                <button class="mode-tab" id="tabRecent" onclick="switchMode('recents')">
+                    <i class="fas fa-clock"></i><span class="tab-label">Récents</span>
+                </button>
+                <button class="mode-tab" id="tabFav" onclick="switchMode('favoris')">
+                    <i class="fas fa-heart"></i><span class="tab-label">Favoris</span>
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label><i class="fas fa-globe"></i> Pays</label>
+                    <div class="select-wrapper">
+                        <select id="countrySelect">
+                            <option value="">Tous les pays</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <!-- Category (TV only) -->
+                <div class="filter-group" id="categoryGroup">
+                    <label><i class="fas fa-th-large"></i> Catégorie</label>
+                    <div class="select-wrapper">
+                        <select id="categorySelect">
+                            <option value="">Toutes les catégories</option>
+                            <option value="news">Actualités</option>
+                            <option value="sports">Sports</option>
+                            <option value="movies">Films</option>
+                            <option value="music">Musique</option>
+                            <option value="kids">Enfants</option>
+                            <option value="entertainment">Divertissement</option>
+                            <option value="documentary">Documentaire</option>
+                            <option value="education">Éducation</option>
+                            <option value="cooking">Cuisine</option>
+                            <option value="travel">Voyage</option>
+                            <option value="business">Business</option>
+                            <option value="science">Science</option>
+                            <option value="general">Général</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <!-- Genre (Radio only) -->
+                <div class="filter-group" id="genreGroup" style="display:none">
+                    <label><i class="fas fa-music"></i> Genre</label>
+                    <div class="select-wrapper">
+                        <select id="genreSelect">
+                            <option value="">Tous les genres</option>
+                            <option value="pop">Pop</option>
+                            <option value="rock">Rock</option>
+                            <option value="jazz">Jazz</option>
+                            <option value="classical">Classique</option>
+                            <option value="hip-hop">Hip-Hop</option>
+                            <option value="rnb">R&B</option>
+                            <option value="electronic">Électronique</option>
+                            <option value="news">Actualités</option>
+                            <option value="talk">Talk</option>
+                            <option value="sports">Sports</option>
+                            <option value="religion">Religion</option>
+                            <option value="world">World</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Header -->
+            <div class="channel-list-header">
+                <span id="listTitle">Toutes les chaînes</span>
+                <span class="list-count" id="listCount">0</span>
+            </div>
+            <div class="channel-list" id="channelList">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Chargement...</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- BOUTON TOGGLE CENTRAL -->
+        <button class="sidebar-divider-btn" id="sidebarDividerBtn" onclick="toggleSidebar()" title="Réduire / Étendre la barre">
+            <i class="fas fa-chevron-left" id="sidebarDividerIcon"></i>
+        </button>
+
+        <!-- PLAYER AREA -->
+        <main class="player-area" id="playerArea">
+
+            <!-- TV Player -->
+            <div class="player-container" id="tvPlayer">
+                <div class="cinema-wrap">
+                    <div class="curtain left"></div>
+                    <div class="curtain right"></div>
+                    <div class="tv-bezel">
+                        <div class="tv-screen" id="tvScreen">
+                            <video id="videoPlayer" controls playsinline></video>
+                            <div class="screen-placeholder" id="placeholder">
+                                <div class="placeholder-inner">
+                                    <img src="images/logo.svg" alt="LOOK TV" style="width:220px;margin:0 auto 1.2rem;display:block;filter:drop-shadow(0 0 30px rgba(255,255,255,0.2));">
+                                    <p>Sélectionnez une chaîne pour commencer</p>
+                                    <div class="placeholder-stats">
+                                        <div class="pstat"><span id="pStatChannels">-</span><small>Chaînes TV</small></div>
+                                        <div class="pstat"><span id="pStatRadios">-</span><small>Radios</small></div>
+                                        <div class="pstat"><span id="pStatCountries">195</span><small>Pays</small></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="screen-error" id="screenError">
+                                <i class="fas fa-wifi"></i>
+                                <p>Chaîne temporairement indisponible</p>
+                                <div class="error-actions">
+                                    <button onclick="retryChannel()"><i class="fas fa-redo"></i> Réessayer</button>
+                                    <button onclick="nextChannel()"><i class="fas fa-forward"></i> Suivante</button>
+                                </div>
+                            </div>
+                            <div class="screen-loading" id="screenLoading">
+                                <div class="spinner large"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radio Player -->
+            <div class="radio-player-container" id="radioPlayer" style="display:none">
+                <div class="radio-visualizer" id="radioVisualizer">
+                    <div class="radio-placeholder" id="radioPlaceholder">
+                        <div class="radio-icon-wrap"><i class="fas fa-broadcast-tower"></i></div>
+                        <h2>LOOK <span>RADIO</span></h2>
+                        <p>Sélectionnez une station pour écouter</p>
+                        <div class="placeholder-stats">
+                            <div class="pstat"><span id="pStatRadios2">-</span><small>Stations</small></div>
+                            <div class="pstat"><span id="pStatCountries2">-</span><small>Pays</small></div>
+                        </div>
+                    </div>
+                    <div class="radio-now-playing" id="radioNowPlaying" style="display:none">
+                        <div class="radio-album-art" id="radioArt">
+                            <img id="radioLogo" src="" alt="" onerror="this.style.display='none';document.getElementById('radioLogoFallback').style.display='flex'">
+                            <div class="radio-logo-fallback" id="radioLogoFallback"><i class="fas fa-broadcast-tower"></i></div>
+                            <div class="radio-pulse-ring"></div>
+                        </div>
+                        <div class="radio-station-info">
+                            <div class="np-live"><span class="dot red"></span> EN DIRECT</div>
+                            <h2 id="radioStationName">-</h2>
+                            <p id="radioStationMeta">-</p>
+                            <div class="radio-tags" id="radioTags"></div>
+                        </div>
+                        <div class="radio-bars" id="radioBars">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Audio Controls -->
+                <div class="radio-controls">
+                    <audio id="audioPlayer" preload="none"></audio>
+                    <div class="radio-ctrl-bar">
+                        <div class="radio-ctrl-info">
+                            <span id="radioCtrlName">-</span>
+                        </div>
+                        <div class="radio-ctrl-btns">
+                            <button class="np-btn" onclick="prevRadio()" title="Précédente"><i class="fas fa-backward"></i></button>
+                            <button class="np-btn play-btn" id="radioPlayBtn" onclick="toggleRadioPlay()">
+                                <i class="fas fa-pause"></i>
+                            </button>
+                            <button class="np-btn" onclick="nextRadio()" title="Suivante"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <div class="radio-volume">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Now Playing Bar (TV) -->
+            <div class="now-playing-bar" id="nowPlayingBar">
+                <div class="np-logo-wrap">
+                    <img id="npLogo" src="" alt="" onerror="this.style.display='none'">
+                    <div class="np-logo-fallback" id="npFallback"><i class="fas fa-tv"></i></div>
+                </div>
+                <div class="np-info">
+                    <div class="np-live"><span class="dot red"></span> EN DIRECT</div>
+                    <div class="np-name" id="npName">-</div>
+                    <div class="np-meta" id="npMeta">-</div>
+                </div>
+                <div class="np-actions">
+                    <button class="np-btn" onclick="toggleFullscreen()" title="Plein écran"><i class="fas fa-expand"></i></button>
+                    <button class="np-btn" onclick="toggleMute()" title="Muet" id="muteBtn"><i class="fas fa-volume-up"></i></button>
+                    <button class="np-btn" onclick="toggleSidebar()" title="Chaînes"><i class="fas fa-list"></i></button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
